@@ -1,1 +1,1 @@
-web: cd Game && npm start
+web: cd Game && node server.js
