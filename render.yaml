@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: 99-idea-puzzle
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd Game && npm install
+    startCommand: cd Game && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

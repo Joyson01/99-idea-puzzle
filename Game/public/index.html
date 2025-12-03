@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>99 Idea Puzzle  - Multiplayer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Main Menu Screen -->
+    <div id="menu-screen" class="screen active">
+      <div class="menu-container">
+        <h1 class="game-title">🎨 99 Idea Puzzle</h1>
+        <p class="game-subtitle">Multiplayer Edition</p>
+
+        <div class="menu-content">
+          <div class="input-group">
+            <label for="player-name">Your Name:</label>
+            <input
+              type="text"
+              id="player-name"
+              placeholder="Enter your name"
+              maxlength="20"
+            />
+          </div>
+
+          <div class="difficulty-selection">
+            <label>Select Difficulty:</label>
+            <div class="difficulty-buttons">
+              <button class="btn-difficulty" data-difficulty="easy">
+                🟢 Easy
+              </button>
+              <button class="btn-difficulty active" data-difficulty="medium">
+                🟡 Medium
+              </button>
+              <button class="btn-difficulty" data-difficulty="hard">
+                🔴 Hard
+              </button>
+              <button class="btn-difficulty" data-difficulty="veryhard">
+                🟣 Very Hard
+              </button>
+              <button class="btn-difficulty" data-difficulty="insane">
+                ⚫ Insane
+              </button>
+            </div>
+            <p class="difficulty-info" id="difficulty-info">
+              Medium: 7x7 board, 3 balls
+            </p>
+          </div>
+
+          <div class="button-group">
+            <button class="btn btn-success" id="play-solo-btn">
+              🎮 Play Solo
+            </button>
+            <button class="btn btn-primary" id="create-room-btn">
+              Create Room
+            </button>
+            <button class="btn btn-secondary" id="join-room-btn">
+              Join Room
+            </button>
+          </div>
+
+          <div id="join-room-container" class="join-container hidden">
+            <div class="input-group">
+              <label for="room-id-input">Room Code:</label>
+              <input
+                type="text"
+                id="room-id-input"
+                placeholder="Enter 6-digit code"
+                maxlength="6"
+              />
+            </div>
+            <button class="btn btn-primary" id="join-room-submit">Join</button>
+            <button class="btn btn-cancel" id="cancel-join-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lobby Screen -->
+    <div id="lobby-screen" class="screen">
+      <div class="lobby-container">
+        <h2>Game Lobby</h2>
+
+        <div class="room-info">
+          <div class="room-code-display">
+            <span>Room Code:</span>
+            <span id="room-code" class="code">------</span>
+            <button class="btn btn-small" id="copy-code-btn">📋 Copy</button>
+          </div>
+        </div>
+
+        <div class="players-section">
+          <h3>Players (<span id="player-count">0</span>/4)</h3>
+          <div id="players-list" class="players-list"></div>
+        </div>
+
+        <div class="lobby-controls">
+          <button class="btn btn-primary" id="ready-btn">Ready</button>
+          <button class="btn btn-success" id="start-btn" style="display: none">
+            🚀 Start Game
+          </button>
+          <button class="btn btn-cancel" id="leave-room-btn">Leave Room</button>
+        </div>
+
+        <div id="waiting-message" class="waiting-message hidden">
+          All players ready! Waiting for host to start the game...
+        </div>
+        <div id="host-can-start-message" class="waiting-message hidden" style="color: #4caf50;">
+          All players ready! Click Start Game to begin the race.
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+      <div class="game-container">
+        <div class="game-header">
+          <h2>99 Idea Puzzle</h2>
+          <div class="turn-indicator">
+            <span id="current-turn">Waiting...</span>
+          </div>
+          <div class="solo-stats" id="solo-stats" style="display: none">
+            <span id="solo-score">Score: 0</span>
+            <span id="solo-moves">Moves: 0</span>
+          </div>
+        </div>
+
+        <div class="game-layout">
+          <div class="sidebar left-sidebar">
+            <div class="scores-panel">
+              <h3>Scores</h3>
+              <div id="scores-list" class="scores-list"></div>
+            </div>
+          </div>
+
+          <div class="game-board-container">
+            <div id="board" class="board"></div>
+
+            <div class="game-controls">
+              <div class="direction-controls">
+                <button class="btn-control" id="btn-up">↑</button>
+                <div class="horizontal-controls">
+                  <button class="btn-control" id="btn-left">←</button>
+                  <button class="btn-control" id="btn-down">↓</button>
+                  <button class="btn-control" id="btn-right">→</button>
+                </div>
+              </div>
+
+              <div class="action-controls">
+                <button class="btn btn-hint" id="hint-btn">💡 Hint</button>
+                <button class="btn btn-success" id="set-btn">SET</button>
+                <button class="btn btn-secondary" id="new-round-btn">
+                  New Round
+                </button>
+                <button
+                  class="btn btn-cancel"
+                  id="quit-solo-btn"
+                  style="display: none"
+                >
+                  🏠 Menu
+                </button>
+              </div>
+              <div id="hint-message" class="hint-message hidden"></div>
+            </div>
+          </div>
+
+          <div class="sidebar right-sidebar">
+            <div class="info-panel">
+              <h3>How to Play</h3>
+              <ul class="instructions">
+                <li>Move colored balls using arrow buttons</li>
+                <li>Position balls next to their matching targets</li>
+                <li>Press SET when all balls are adjacent to targets</li>
+                <li id="multiplayer-tip">Take turns with other players</li>
+                <li id="solo-tip" style="display: none">
+                  Solve puzzles at your own pace!
+                </li>
+                <li>Complete rounds to earn points!</li>
+                <li>
+                  <strong>💡 Click Hint</strong> for help solving the puzzle
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Leaderboard</h3>
+          <button id="leaderboard-close" class="btn-close">✖</button>
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+        <div class="modal-footer">
+          <button id="leaderboard-close-btn" class="btn btn-primary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>
