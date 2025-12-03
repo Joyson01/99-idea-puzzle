@@ -17,6 +17,7 @@ cd C:\Users\joyso\Downloads\game\pubg
 ```
 
 This script will:
+
 - Initialize Git repository
 - Commit your code
 - Help you push to GitHub
@@ -65,7 +66,7 @@ git push -u origin main
 ✅ `.gitignore` - Excludes node_modules  
 ✅ `package.json` - Updated with correct scripts  
 ✅ `DEPLOY-ONLINE.md` - Complete deployment guide  
-✅ `deploy-online.bat` - Automated deploy script  
+✅ `deploy-online.bat` - Automated deploy script
 
 ## 🔗 Quick Links
 
@@ -97,16 +98,19 @@ npx cap open android
 ## 🆘 Need Help?
 
 **Deployment failing?**
+
 - Check `DEPLOY-ONLINE.md` for troubleshooting
 - Verify all files are committed
 - Check deployment logs on platform
 
 **Game not loading?**
+
 - Wait for deployment to complete (3-5 min)
 - Check server logs for errors
 - Try different browser
 
 **Still stuck?**
+
 - Read full guide: `DEPLOY-ONLINE.md`
 - Check platform documentation
 - Verify Node.js version (18+)

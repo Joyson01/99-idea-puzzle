@@ -9,7 +9,7 @@ A real-time multiplayer puzzle game where players race to solve color-matching c
 - 🧩 **5 Difficulty Levels** - Easy to Insane (5x5 to 13x13 boards)
 - 🤖 **AI Hints** - Get smart suggestions using A\* pathfinding
 - 🏆 **Race Mode** - Compete for fastest completion
-- 📱 **Mobile Ready** - Touch controls optimized for phones
+- 📱 **Mobile Friendly** - Works on phones and tablets via browser
 
 ## 🚀 Quick Start
 
@@ -26,17 +26,6 @@ npm start
 ```
 
 Open browser: `http://localhost:3000`
-
-## 📱 Mobile App (Android)
-
-Build your own APK:
-
-```powershell
-cd Game
-.\build-android.bat
-```
-
-See [QUICK-APK-GUIDE.md](Game/QUICK-APK-GUIDE.md) for details.
 
 ## 🌐 Deploy Your Own Server
 
@@ -68,7 +57,6 @@ See [DEPLOY-ONLINE.md](DEPLOY-ONLINE.md) for complete instructions.
 - **Backend**: Node.js + Express
 - **Real-time**: Socket.IO
 - **Frontend**: Vanilla JavaScript
-- **Mobile**: Capacitor (Android)
 - **AI**: A\* Pathfinding Algorithm
 
 ## 📂 Project Structure
@@ -110,9 +98,8 @@ const CONFIG = {
 ## 📖 Documentation
 
 - [Deployment Guide](DEPLOY-ONLINE.md) - Deploy to cloud
-- [APK Build Guide](Game/QUICK-APK-GUIDE.md) - Build Android app
-- [Server Deployment](Game/deploy-server.md) - Server hosting options
-- [Copilot Instructions](Game/.github/copilot-instructions.md) - Development guide
+- [Quick Deploy Checklist](DEPLOY-CHECKLIST.md) - Fast deployment steps
+- [Copilot Instructions](.github/copilot-instructions.md) - Development guide
 
 ## 🐛 Troubleshooting
 
@@ -127,12 +114,6 @@ const CONFIG = {
 - Ensure server is running
 - Check firewall settings
 - Verify Socket.IO connections in console
-
-### APK build fails
-
-- Install Android Studio
-- Check Java JDK version
-- See [build-apk.md](Game/build-apk.md)
 
 ## 🤝 Contributing
 
@@ -156,4 +137,4 @@ Developed with ❤️ using AI assistance
 
 👉 [Play Online](https://your-deployed-url.com)  
 👉 [Deploy Your Own](DEPLOY-ONLINE.md)  
-👉 [Build APK](Game/QUICK-APK-GUIDE.md)
+👉 [Quick Setup Guide](DEPLOY-CHECKLIST.md)
