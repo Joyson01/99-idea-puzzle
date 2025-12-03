@@ -1,16 +1,16 @@
 {
-  "name": "pubg",
+  "name": "99-idea-puzzle",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Multiplayer puzzle game with real-time gameplay",
+  "main": "Game/server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "cd Game && node server.js",
+    "install": "cd Game && npm install"
   },
-  "keywords": [],
+  "keywords": ["game", "multiplayer", "puzzle"],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "express": "^5.2.1",
-    "socket.io": "^4.8.1"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

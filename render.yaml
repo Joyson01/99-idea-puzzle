@@ -4,10 +4,8 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: cd Game && npm install
-    startCommand: cd Game && npm start
+    buildCommand: npm install --prefix Game
+    startCommand: cd Game && node server.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
