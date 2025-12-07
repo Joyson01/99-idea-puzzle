@@ -1617,23 +1617,29 @@ legend {
  * ============================================================================ */
 
 @media (max-width: 639px) {
+  :root {
+    --space-lg: 1rem;
+    --space-xl: 1.5rem;
+  }
+
   body {
-    padding: 0.9375rem;
+    padding: 0.5rem;
   }
 
   .menu-container,
   .lobby-container {
-    padding: var(--space-lg) var(--space-md);
-    border-radius: var(--border-radius-lg);
+    padding: var(--space-md) var(--space-sm);
+    max-width: 100%;
+    border-radius: var(--border-radius-md);
   }
 
   .game-title {
-    font-size: var(--font-size-2xl);
+    font-size: 1.75rem;
   }
 
   .game-subtitle {
-    font-size: var(--font-size-base);
-    margin-bottom: var(--space-xl);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
   }
 
   .button-group {
@@ -1643,31 +1649,35 @@ legend {
 
   .button-group .btn {
     width: 100%;
+    min-height: 2.5rem;
+    padding: var(--space-sm);
   }
 
   .btn {
     padding: var(--space-sm) var(--space-md);
     font-size: var(--font-size-sm);
+    min-height: 2.5rem;
   }
 
-  .difficulty-buttons {
-    flex-direction: column;
-    gap: var(--space-xs);
-  }
-
-  .btn-difficulty {
-    width: 100%;
-    min-width: unset;
-    padding: var(--space-sm) var(--space-md);
+  .btn-small {
+    padding: var(--space-xs) var(--space-sm);
     font-size: var(--font-size-xs);
+    min-height: 2rem;
   }
 
-  .difficulty-info {
-    font-size: var(--font-size-xs);
+  .difficulty-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .difficulty-card-body {
+    padding: var(--space-sm);
+    min-height: 3rem;
   }
 
   .game-container {
     padding: var(--space-md);
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   .game-header {
@@ -1676,104 +1686,60 @@ legend {
   }
 
   .header-top {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: var(--space-sm);
   }
 
-  .game-header h2 {
-    font-size: var(--font-size-xl);
-  }
-
-  .cell {
-    width: 2.375rem;
-    height: 2.375rem;
-  }
-
-  .dot {
-    width: 1.375rem;
-    height: 1.375rem;
-  }
-
-  .dot.target {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
-
-  .btn-control {
-    width: 3.125rem;
-    height: 3.125rem;
-    font-size: var(--font-size-xl);
-  }
-
-  .action-controls {
-    gap: var(--space-sm);
-    padding: var(--space-md);
-    flex-direction: column;
-  }
-
-  .action-controls .btn {
+  .header-left {
     width: 100%;
   }
 
-  .hint-message {
+  .header-right {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .game-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .solo-stats {
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    width: 100%;
+  }
+
+  .turn-indicator {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.6rem;
+  }
+
+  .game-layout {
+    gap: var(--space-lg);
+    padding: 0;
+  }
+
+  .game-main-content {
+    flex-direction: column;
+    gap: var(--space-lg);
     max-width: 100%;
-    padding: var(--space-md);
-    font-size: var(--font-size-sm);
   }
 
-  .sidebar {
-    padding: var(--space-md);
-  }
-
-  .instructions li {
-    font-size: var(--font-size-xs);
-    padding-left: var(--space-md);
-  }
-
-  .scores-list {
-    gap: var(--space-xs);
-  }
-
-  .score-item {
-    padding: var(--space-sm);
-    font-size: var(--font-size-xs);
-  }
-
-  .modal-content {
-    width: 95%;
+  .scores-sidebar {
+    width: 100%;
+    min-width: auto;
+    max-height: auto;
     padding: var(--space-md);
   }
 
-  .modal-header h3 {
-    font-size: var(--font-size-xl);
-  }
-
-  .btn-close {
-    width: 2rem;
-    height: 2rem;
+  .scores-panel h3 {
     font-size: var(--font-size-base);
   }
 
-  .leaderboard-list {
-    max-height: 18.75rem;
-    gap: var(--space-xs);
-  }
-
-  .leaderboard-item {
-    padding: var(--space-sm);
-    font-size: var(--font-size-xs);
-  }
-
-  .player-rank {
-    padding: var(--space-xs) var(--space-xs);
-    font-size: 0.65rem;
-  }
-
-  .notification {
-    top: var(--space-sm);
-    right: var(--space-sm);
-    padding: var(--space-sm);
-    font-size: var(--font-size-sm);
+  .game-board-section {
+    width: 100%;
+    gap: var(--space-md);
   }
 
   .board {
@@ -1781,25 +1747,115 @@ legend {
     gap: var(--space-xs);
   }
 
-  .turn-indicator {
-    font-size: var(--font-size-base);
-    padding: var(--space-sm) var(--space-md);
+  .cell {
+    width: 2rem;
+    height: 2rem;
   }
 
-  .solo-stats {
-    gap: var(--space-lg);
+  .dot {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .dot.target {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .game-controls {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+
+  .direction-pad {
+    width: 100%;
+    padding: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .btn-control {
+    width: 3rem;
+    height: 3rem;
+    font-size: var(--font-size-lg);
+  }
+
+  .horizontal-controls {
+    gap: var(--space-xs);
+  }
+
+  .action-buttons-wrapper {
+    width: 100%;
+    padding: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .action-buttons-wrapper .btn {
+    padding: var(--space-sm);
+    font-size: var(--font-size-xs);
+    min-height: 2.25rem;
+  }
+
+  .hint-message {
+    max-width: 100%;
+    padding: var(--space-md);
+    font-size: var(--font-size-xs);
+  }
+
+  .notification {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: calc(100vw - 1rem);
+    padding: var(--space-sm);
     font-size: var(--font-size-sm);
+    border-radius: var(--border-radius-md);
+  }
+
+  .modal-content {
+    width: 90vw;
+    max-width: 100%;
+    padding: var(--space-md);
+  }
+
+  .modal-content.modal-large {
+    width: 95vw;
+    max-height: 80vh;
+  }
+
+  .instructions li {
+    font-size: var(--font-size-xs);
+    padding-left: var(--space-md);
+  }
+
+  .player-item {
+    padding: var(--space-sm);
+    flex-direction: column;
+    gap: var(--space-xs);
+    align-items: flex-start;
   }
 
   .room-code-display {
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    padding: var(--space-lg);
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
   }
 
   .code {
-    font-size: var(--font-size-xl);
+    font-size: 1rem;
     letter-spacing: 0.25em;
+  }
+
+  .leaderboard-item {
+    flex-direction: column;
+    gap: var(--space-xs);
+    align-items: flex-start;
+  }
+
+  .leaderboard-item strong {
+    margin-right: 0;
+    margin-bottom: var(--space-xs);
   }
 }
 
@@ -1810,6 +1866,10 @@ legend {
 
   .button-group .btn {
     flex: 1;
+  }
+
+  .difficulty-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .difficulty-buttons {
@@ -1832,11 +1892,29 @@ legend {
   .action-buttons-wrapper .btn {
     flex: 1;
   }
+
+  .header-top {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header-right {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
 
 @media (min-width: 768px) {
+  :root {
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+  }
+
+  body {
+    padding: var(--space-lg);
+  }
+
   .header-top {
-    flex-wrap: nowrap;
+    grid-template-columns: 1fr auto;
   }
 
   .game-main-content {
@@ -1846,10 +1924,29 @@ legend {
   .scores-sidebar {
     flex: 0 0 auto;
     min-width: 18rem;
+    max-height: 28rem;
   }
 
   .game-board-section {
     flex: 1;
+  }
+
+  .game-controls {
+    max-width: 22rem;
+  }
+
+  .board {
+    padding: var(--space-lg);
+  }
+
+  .cell {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .dot {
+    width: 1.375rem;
+    height: 1.375rem;
   }
 }
 
@@ -1874,13 +1971,61 @@ legend {
   }
 }
 
+@media (min-width: 960px) {
+  .difficulty-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cta-group {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 1024px) {
+  :root {
+    --space-lg: 1.5rem;
+    --space-xl: 2.5rem;
+  }
+
   .game-layout {
     gap: var(--space-xl);
   }
 
+  .game-main-content {
+    max-width: 90rem;
+  }
+
   .scores-sidebar {
-    max-width: 53rem;
+    min-width: 20rem;
+    max-height: 32rem;
+  }
+
+  .board {
+    padding: var(--space-xl);
+  }
+
+  .cell {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .dot {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+
+  .game-controls {
+    max-width: 24rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .game-container {
+    padding: var(--space-2xl);
+  }
+
+  .game-layout {
+    padding: 0 var(--space-xl);
   }
 }
 
