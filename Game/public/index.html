@@ -3,26 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="99 Idea Puzzle: A multiplayer color merge puzzle game. Play solo or with friends!" />
+    <meta
+      name="description"
+      content="99 Idea Puzzle: A multiplayer color merge puzzle game. Play solo or with friends!"
+    />
     <title>99 Idea Puzzle - Multiplayer</title>
     <link rel="stylesheet" href="design-tokens.css" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <!-- Main Menu Screen -->
-    <section id="menu-screen" class="screen active" role="main" aria-label="Main menu">
+    <section
+      id="menu-screen"
+      class="screen active"
+      role="main"
+      aria-label="Main menu"
+    >
       <div class="menu-container">
         <header class="menu-header" role="banner">
           <h1 class="game-title">99 Idea Puzzle</h1>
           <h2 class="game-subtitle">Color Merge Challenge</h2>
-          <button class="btn-icon btn-help" id="how-to-play-btn" aria-label="Open how to play guide">
+          <button
+            class="btn-icon btn-help"
+            id="how-to-play-btn"
+            aria-label="Open how to play guide"
+          >
             ?
           </button>
         </header>
         <main class="menu-content" id="main-content">
           <fieldset>
             <legend class="visually-hidden">Player Settings</legend>
-            
+
             <div class="input-group">
               <label for="player-name">Your Name</label>
               <input
@@ -34,7 +46,10 @@
               />
             </div>
 
-            <fieldset class="difficulty-section" aria-labelledby="difficulty-legend">
+            <fieldset
+              class="difficulty-section"
+              aria-labelledby="difficulty-legend"
+            >
               <legend id="difficulty-legend">Select Difficulty</legend>
               <div class="difficulty-grid">
                 <label class="difficulty-card" data-level="easy">
@@ -64,7 +79,10 @@
                     checked
                   />
                   <span class="difficulty-card-body">
-                    <span class="difficulty-dot medium" aria-hidden="true"></span>
+                    <span
+                      class="difficulty-dot medium"
+                      aria-hidden="true"
+                    ></span>
                     <span class="difficulty-text">
                       <span class="difficulty-name">Medium</span>
                       <span class="difficulty-meta">7x7 board · 3 balls</span>
@@ -98,7 +116,10 @@
                     aria-label="Very hard difficulty: 11x11 board, 5 balls"
                   />
                   <span class="difficulty-card-body">
-                    <span class="difficulty-dot veryhard" aria-hidden="true"></span>
+                    <span
+                      class="difficulty-dot veryhard"
+                      aria-hidden="true"
+                    ></span>
                     <span class="difficulty-text">
                       <span class="difficulty-name">Very Hard</span>
                       <span class="difficulty-meta">11x11 board · 5 balls</span>
@@ -115,7 +136,10 @@
                     aria-label="Insane difficulty: 13x13 board, 6 balls"
                   />
                   <span class="difficulty-card-body">
-                    <span class="difficulty-dot insane" aria-hidden="true"></span>
+                    <span
+                      class="difficulty-dot insane"
+                      aria-hidden="true"
+                    ></span>
                     <span class="difficulty-text">
                       <span class="difficulty-name">Insane</span>
                       <span class="difficulty-meta">13x13 board · 6 balls</span>
@@ -123,24 +147,45 @@
                   </span>
                 </label>
               </div>
-              <p class="difficulty-info" id="difficulty-info" aria-live="polite">
+              <p
+                class="difficulty-info"
+                id="difficulty-info"
+                aria-live="polite"
+              >
                 Medium: 7x7 board, 3 balls
               </p>
             </fieldset>
 
             <div class="button-group cta-group">
-              <button class="btn btn-success" id="play-solo-btn" aria-describedby="solo-description">
+              <button
+                class="btn btn-success"
+                id="play-solo-btn"
+                aria-describedby="solo-description"
+              >
                 🎮 Play Solo
               </button>
-              <button class="btn btn-primary" id="create-room-btn" aria-describedby="create-description">
+              <button
+                class="btn btn-primary"
+                id="create-room-btn"
+                aria-describedby="create-description"
+              >
                 Create Room
               </button>
-              <button class="btn btn-secondary" id="join-room-btn" aria-describedby="join-description">
+              <button
+                class="btn btn-secondary"
+                id="join-room-btn"
+                aria-describedby="join-description"
+              >
                 Join Room
               </button>
             </div>
 
-            <div id="join-room-container" class="join-container hidden" role="region" aria-labelledby="join-title">
+            <div
+              id="join-room-container"
+              class="join-container hidden"
+              role="region"
+              aria-labelledby="join-title"
+            >
               <h3 id="join-title" class="visually-hidden">Join Room</h3>
               <div class="input-group">
                 <label for="room-id-input">Room Code</label>
@@ -154,8 +199,12 @@
                 />
                 <small id="room-code-hint">Enter a 6-character room code</small>
               </div>
-              <button class="btn btn-primary" id="join-room-submit">Join</button>
-              <button class="btn btn-cancel" id="cancel-join-btn">Cancel</button>
+              <button class="btn btn-primary" id="join-room-submit">
+                Join
+              </button>
+              <button class="btn btn-cancel" id="cancel-join-btn">
+                Cancel
+              </button>
             </div>
           </fieldset>
         </main>
@@ -163,7 +212,12 @@
     </section>
 
     <!-- Lobby Screen -->
-    <section id="lobby-screen" class="screen" role="main" aria-label="Game lobby">
+    <section
+      id="lobby-screen"
+      class="screen"
+      role="main"
+      aria-label="Game lobby"
+    >
       <div class="lobby-container">
         <header>
           <h2>Game Lobby</h2>
@@ -172,25 +226,47 @@
         <article class="room-info">
           <div class="room-code-display">
             <span>Room Code:</span>
-            <output id="room-code" class="code" aria-label="Current room code">------</output>
-            <button class="btn btn-small" id="copy-code-btn" aria-label="Copy room code to clipboard">📋 Copy</button>
+            <output id="room-code" class="code" aria-label="Current room code"
+              >------</output
+            >
+            <button
+              class="btn btn-small"
+              id="copy-code-btn"
+              aria-label="Copy room code to clipboard"
+            >
+              📋 Copy
+            </button>
           </div>
         </article>
 
         <section class="players-section" aria-labelledby="players-heading">
-          <h3 id="players-heading">Players (<span id="player-count" aria-live="polite">0</span>/4)</h3>
+          <h3 id="players-heading">
+            Players (<span id="player-count" aria-live="polite">0</span>/4)
+          </h3>
           <ul id="players-list" class="players-list" role="list"></ul>
         </section>
 
         <div class="lobby-controls">
-          <button class="btn btn-primary" id="ready-btn" aria-pressed="false">Ready</button>
-          <button class="btn btn-success" id="start-btn" style="display: none" aria-label="Start the game">
+          <button class="btn btn-primary" id="ready-btn" aria-pressed="false">
+            Ready
+          </button>
+          <button
+            class="btn btn-success"
+            id="start-btn"
+            style="display: none"
+            aria-label="Start the game"
+          >
             🚀 Start Game
           </button>
           <button class="btn btn-cancel" id="leave-room-btn">Leave Room</button>
         </div>
 
-        <div id="waiting-message" class="waiting-message hidden" role="status" aria-live="polite">
+        <div
+          id="waiting-message"
+          class="waiting-message hidden"
+          role="status"
+          aria-live="polite"
+        >
           All players ready! Waiting for host to start the game...
         </div>
         <div
@@ -206,89 +282,209 @@
     </section>
 
     <!-- Game Screen -->
-    <section id="game-screen" class="screen" role="main" aria-label="Game play area">
+    <section
+      id="game-screen"
+      class="screen"
+      role="main"
+      aria-label="Game play area"
+    >
       <div class="game-container">
         <header class="game-header">
           <div class="header-top">
-            <h2>99 Idea Puzzle</h2>
-            <button
-              class="btn-icon btn-help"
-              id="game-instructions-btn"
-              aria-label="Open game instructions"
-            >
-              ?
-            </button>
+            <div class="header-left">
+              <h2>99 Idea Puzzle</h2>
+              <div
+                class="turn-indicator"
+                id="current-turn"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                Waiting...
+              </div>
+            </div>
+            <div class="header-right">
+              <section
+                id="solo-stats"
+                class="solo-stats"
+                style="display: none"
+                aria-labelledby="solo-stats-heading"
+              >
+                <h3 id="solo-stats-heading" class="visually-hidden">
+                  Game Statistics
+                </h3>
+                <div class="stat-item">
+                  <span class="stat-label">Score:</span>
+                  <output id="solo-score" aria-label="Current score">0</output>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">Moves:</span>
+                  <output id="solo-moves" aria-label="Number of moves"
+                    >0</output
+                  >
+                </div>
+              </section>
+              <button
+                class="btn-icon btn-help"
+                id="game-instructions-btn"
+                aria-label="Open game instructions"
+              >
+                ?
+              </button>
+            </div>
           </div>
-          <div class="turn-indicator" id="current-turn" role="status" aria-live="polite" aria-atomic="true">Waiting...</div>
-          <section id="solo-stats" class="solo-stats" style="display: none" aria-labelledby="solo-stats-heading">
-            <h3 id="solo-stats-heading" class="visually-hidden">Game Statistics</h3>
-            <output id="solo-score" aria-label="Current score">Score: 0</output>
-            <output id="solo-moves" aria-label="Number of moves">Moves: 0</output>
-          </section>
         </header>
 
         <div class="game-layout">
-          <aside class="sidebar" aria-labelledby="scores-heading">
-            <article class="scores-panel">
-              <h3 id="scores-heading">Scores</h3>
-              <ul id="scores-list" class="scores-list" role="list"></ul>
-            </article>
-          </aside>
+          <div class="game-main-content">
+            <!-- Scores Sidebar (Top on Mobile) -->
+            <aside class="scores-sidebar" aria-labelledby="scores-heading">
+              <article class="scores-panel">
+                <h3 id="scores-heading">Scores</h3>
+                <ul id="scores-list" class="scores-list" role="list"></ul>
+              </article>
+            </aside>
 
-          <section class="game-board-container" role="region" aria-labelledby="board-heading">
-            <h2 id="board-heading" class="visually-hidden">Game Board</h2>
-            <div id="board" class="board" role="img" aria-label="Interactive game board with colored balls and targets"></div>
+            <!-- Game Board & Controls -->
+            <section
+              class="game-board-section"
+              role="region"
+              aria-labelledby="board-heading"
+            >
+              <h2 id="board-heading" class="visually-hidden">Game Board</h2>
 
-            <section class="game-controls" aria-labelledby="controls-heading">
-              <h3 id="controls-heading" class="visually-hidden">Game Controls</h3>
-              <fieldset class="direction-controls">
-                <legend class="visually-hidden">Direction Controls</legend>
-                <button class="btn-control" id="btn-up" aria-label="Move balls up">↑</button>
-                <div class="horizontal-controls" role="group" aria-label="Left, down, right directions">
-                  <button class="btn-control" id="btn-left" aria-label="Move balls left">←</button>
-                  <button class="btn-control" id="btn-down" aria-label="Move balls down">↓</button>
-                  <button class="btn-control" id="btn-right" aria-label="Move balls right">→</button>
+              <div class="board-wrapper">
+                <div
+                  id="board"
+                  class="board"
+                  role="img"
+                  aria-label="Interactive game board with colored balls and targets"
+                ></div>
+              </div>
+
+              <!-- Controls Section -->
+              <section class="game-controls" aria-labelledby="controls-heading">
+                <h3 id="controls-heading" class="visually-hidden">
+                  Game Controls
+                </h3>
+
+                <!-- Direction Pad -->
+                <div class="direction-pad">
+                  <button
+                    class="btn-control"
+                    id="btn-up"
+                    aria-label="Move balls up"
+                  >
+                    ↑
+                  </button>
+                  <div
+                    class="horizontal-controls"
+                    role="group"
+                    aria-label="Left, down, right directions"
+                  >
+                    <button
+                      class="btn-control"
+                      id="btn-left"
+                      aria-label="Move balls left"
+                    >
+                      ←
+                    </button>
+                    <button
+                      class="btn-control"
+                      id="btn-down"
+                      aria-label="Move balls down"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      class="btn-control"
+                      id="btn-right"
+                      aria-label="Move balls right"
+                    >
+                      →
+                    </button>
+                  </div>
                 </div>
-              </fieldset>
 
-              <fieldset class="action-controls">
-                <legend class="visually-hidden">Action Buttons</legend>
-                <button class="btn btn-hint" id="hint-btn" aria-label="Get AI hint for next move">💡 Hint</button>
-                <button class="btn btn-success" id="set-btn" aria-label="Submit solution - activates when all balls are adjacent to targets">SET</button>
-                <button class="btn btn-secondary" id="new-round-btn" aria-label="Start a new puzzle round">
-                  New Round
-                </button>
-                <button
-                  class="btn btn-cancel"
-                  id="quit-solo-btn"
-                  style="display: none"
-                  aria-label="Return to main menu"
-                >
-                  🏠 Menu
-                </button>
-              </fieldset>
-              <div id="hint-message" class="hint-message hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+                <!-- Action Buttons -->
+                <div class="action-buttons-wrapper">
+                  <button
+                    class="btn btn-hint"
+                    id="hint-btn"
+                    aria-label="Get AI hint for next move"
+                  >
+                    💡 Hint
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    id="set-btn"
+                    aria-label="Submit solution - activates when all balls are adjacent to targets"
+                  >
+                    SET
+                  </button>
+                  <button
+                    class="btn btn-secondary"
+                    id="new-round-btn"
+                    aria-label="Start a new puzzle round"
+                  >
+                    New Round
+                  </button>
+                  <button
+                    class="btn btn-cancel"
+                    id="quit-solo-btn"
+                    style="display: none"
+                    aria-label="Return to main menu"
+                  >
+                    🏠 Menu
+                  </button>
+                </div>
+
+                <!-- Hint Message -->
+                <div
+                  id="hint-message"
+                  class="hint-message hidden"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                ></div>
+              </section>
             </section>
-          </section>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Notification Toast -->
-    <div id="notification" class="notification" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div
+      id="notification"
+      class="notification"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
 
     <!-- Leaderboard Modal -->
     <dialog id="leaderboard-modal" class="modal hidden">
       <article class="modal-content">
         <header class="modal-header">
           <h2>Leaderboard</h2>
-          <button id="leaderboard-close" class="btn-close" aria-label="Close leaderboard">✖</button>
+          <button
+            id="leaderboard-close"
+            class="btn-close"
+            aria-label="Close leaderboard"
+          >
+            ✖
+          </button>
         </header>
         <section class="modal-body">
           <ul id="leaderboard-list" class="leaderboard-list" role="list"></ul>
         </section>
         <footer class="modal-footer">
-          <button id="leaderboard-close-btn" class="btn btn-primary" aria-label="Close this dialog">
+          <button
+            id="leaderboard-close-btn"
+            class="btn btn-primary"
+            aria-label="Close this dialog"
+          >
             Close
           </button>
         </footer>
@@ -300,7 +496,13 @@
       <article class="modal-content modal-large">
         <header class="modal-header">
           <h2>How to Play</h2>
-          <button id="game-instructions-close" class="btn-close" aria-label="Close instructions">✖</button>
+          <button
+            id="game-instructions-close"
+            class="btn-close"
+            aria-label="Close instructions"
+          >
+            ✖
+          </button>
         </header>
         <section class="modal-body">
           <ul class="instructions" role="list">
@@ -316,7 +518,11 @@
           </ul>
         </section>
         <footer class="modal-footer">
-          <button id="game-instructions-close-btn" class="btn btn-primary" aria-label="Close this dialog">
+          <button
+            id="game-instructions-close-btn"
+            class="btn btn-primary"
+            aria-label="Close this dialog"
+          >
             Got it!
           </button>
         </footer>
@@ -328,7 +534,13 @@
       <article class="modal-content modal-large">
         <header class="modal-header">
           <h2>How to Play</h2>
-          <button id="how-to-play-close" class="btn-close" aria-label="Close how to play guide">✖</button>
+          <button
+            id="how-to-play-close"
+            class="btn-close"
+            aria-label="Close how to play guide"
+          >
+            ✖
+          </button>
         </header>
         <section class="modal-body">
           <section class="tutorial-section" aria-labelledby="objective-heading">
@@ -398,7 +610,11 @@
           </section>
         </section>
         <footer class="modal-footer">
-          <button id="how-to-play-close-btn" class="btn btn-primary" aria-label="Close this dialog">
+          <button
+            id="how-to-play-close-btn"
+            class="btn btn-primary"
+            aria-label="Close this dialog"
+          >
             Got it!
           </button>
         </footer>
