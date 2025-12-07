@@ -107,9 +107,26 @@ const leaderboardModal = document.getElementById("leaderboard-modal");
 const leaderboardList = document.getElementById("leaderboard-list");
 const leaderboardClose = document.getElementById("leaderboard-close");
 const leaderboardCloseBtn = document.getElementById("leaderboard-close-btn");
+const howToPlayBtn = document.getElementById("how-to-play-btn");
+const howToPlayModal = document.getElementById("how-to-play-modal");
+const howToPlayClose = document.getElementById("how-to-play-close");
+const howToPlayCloseBtn = document.getElementById("how-to-play-close-btn");
+const gameHowToPlayBtn = document.getElementById("game-how-to-play-btn");
+
+// Game instructions modal (in-game)
+const gameInstructionsBtn = document.getElementById("game-instructions-btn");
+const gameInstructionsModal = document.getElementById(
+  "game-instructions-modal"
+);
+const gameInstructionsClose = document.getElementById(
+  "game-instructions-close"
+);
+const gameInstructionsCloseBtn = document.getElementById(
+  "game-instructions-close-btn"
+);
 
 // Difficulty selection
-const difficultyBtns = document.querySelectorAll(".btn-difficulty");
+const difficultyRadios = document.querySelectorAll('input[name="difficulty"]');
 const difficultyInfo = document.getElementById("difficulty-info");
 
 // Single player elements
@@ -150,18 +167,28 @@ function showNotification(message, type = "info") {
 // ============================================================================
 // EVENT LISTENERS - DIFFICULTY SELECTION
 // ============================================================================
-difficultyBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    difficultyBtns.forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    selectedDifficulty = btn.dataset.difficulty;
+function updateDifficultySelection(nextDifficulty) {
+  selectedDifficulty = nextDifficulty;
+  difficultyRadios.forEach((radio) => {
+    const isSelected = radio.dataset.difficulty === nextDifficulty;
+    radio.checked = isSelected;
+  });
 
-    const difficultyData = DIFFICULTY_INFO[selectedDifficulty];
-    if (difficultyData) {
-      difficultyInfo.textContent = difficultyData.text;
-    }
+  const difficultyData = DIFFICULTY_INFO[selectedDifficulty];
+  if (difficultyData && difficultyInfo) {
+    difficultyInfo.textContent = difficultyData.text;
+  }
+}
+
+difficultyRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    const nextDifficulty = radio.dataset.difficulty || radio.value;
+    updateDifficultySelection(nextDifficulty);
   });
 });
+
+// Align UI with default difficulty on load
+updateDifficultySelection(selectedDifficulty);
 
 // ============================================================================
 // HELPER FUNCTIONS - INPUT VALIDATION
@@ -256,7 +283,7 @@ function updateSoloStats() {
 }
 
 function createLocalPuzzle(difficulty) {
-  const COLORS = ["red", "yellow", "cyan"];
+  const COLORS = ["#00ffff", "#ff007f", "#ffff00"];
   const DIFFICULTY_SETTINGS = {
     easy: { size: 5, balls: 2, minDistance: 2 },
     medium: { size: 7, balls: 3, minDistance: 3 },
@@ -895,6 +922,67 @@ leaderboardCloseBtn.addEventListener("click", () => {
   leaderboardModal.classList.add("hidden");
 });
 
+// How to Play Modal Handlers
+howToPlayBtn.addEventListener("click", () => {
+  howToPlayModal.classList.remove("hidden");
+});
+
+howToPlayClose.addEventListener("click", () => {
+  howToPlayModal.classList.add("hidden");
+});
+
+howToPlayCloseBtn.addEventListener("click", () => {
+  howToPlayModal.classList.add("hidden");
+});
+
+// Close modal when clicking outside (on the modal backdrop)
+howToPlayModal.addEventListener("click", (e) => {
+  if (e.target === howToPlayModal) {
+    howToPlayModal.classList.add("hidden");
+  }
+});
+
+leaderboardModal.addEventListener("click", (e) => {
+  if (e.target === leaderboardModal) {
+    leaderboardModal.classList.add("hidden");
+  }
+});
+
+// Game screen How to Play button
+if (gameHowToPlayBtn) {
+  gameHowToPlayBtn.addEventListener("click", () => {
+    howToPlayModal.classList.remove("hidden");
+  });
+}
+
+// Game Instructions Modal Handlers (in-game)
+if (gameInstructionsBtn) {
+  gameInstructionsBtn.addEventListener("click", () => {
+    gameInstructionsModal.classList.remove("hidden");
+  });
+}
+
+if (gameInstructionsClose) {
+  gameInstructionsClose.addEventListener("click", () => {
+    gameInstructionsModal.classList.add("hidden");
+  });
+}
+
+if (gameInstructionsCloseBtn) {
+  gameInstructionsCloseBtn.addEventListener("click", () => {
+    gameInstructionsModal.classList.add("hidden");
+  });
+}
+
+// Close game instructions modal when clicking outside
+if (gameInstructionsModal) {
+  gameInstructionsModal.addEventListener("click", (e) => {
+    if (e.target === gameInstructionsModal) {
+      gameInstructionsModal.classList.add("hidden");
+    }
+  });
+}
+
 socket.on("youFinished", ({ rank }) => {
   try {
     showNotification(`You finished! Rank ${rank}`, "success");
@@ -1110,11 +1198,11 @@ function renderBoard() {
       const item = grid[r][c];
       if (item) {
         if (item.type === "blob") {
-          cell.innerHTML = `<div class="dot" style="background: ${item.color}"></div>`;
+          cell.innerHTML = `<div class="dot" style="background: ${item.color}; box-shadow: 0 0 12px ${item.color}, 0 2px 10px rgba(0, 0, 0, 0.3);"></div>`;
         } else if (item.type === "king") {
-          cell.innerHTML = `<div class="king" style="background: ${item.color}"></div>`;
+          cell.innerHTML = `<div class="king" style="background: ${item.color}; box-shadow: 0 0 20px ${item.color};"></div>`;
         } else if (item.type === "target") {
-          cell.innerHTML = `<div class="dot target" style="border: 3px solid ${item.color}; background: #fff"></div>`;
+          cell.innerHTML = `<div class="dot target" style="border: 3px solid ${item.color}; box-shadow: 0 0 15px ${item.color}; background: rgba(255, 255, 255, 0.1);"></div>`;
         }
       }
 

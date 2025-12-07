@@ -1,0 +1,81 @@
+:root {
+  /* Core colors */
+  --color-bg: #060b1a;
+  --color-surface: #0c1427;
+  --color-surface-soft: #101c33;
+  --color-surface-muted: #0f1a30;
+  --color-surface-card: #101c33;
+  --color-surface-glass: rgba(12, 20, 39, 0.85);
+  --color-text: #e7ecf7;
+  --color-text-muted: #9fb3d2;
+  --color-text-soft: #b2c6e3;
+  --color-accent: #35d6ff;
+  --color-accent-strong: #5be6c5;
+  --color-accent-contrast: #0c1427;
+  --color-accent-glow: #35d6ff33;
+  --color-success: #5be6c5;
+  --color-warning: #ffe066;
+  --color-danger: #ff5e7e;
+  --color-purple: #b97aff;
+  --color-grey: #7a8ca3;
+  --color-muted: #162544;
+
+  /* Difficulty colors */
+  --difficulty-easy: #5be6c5;
+  --difficulty-medium: #ffe066;
+  --difficulty-hard: #ff5e7e;
+  --difficulty-insane: #b97aff;
+  --difficulty-custom: #7a8ca3;
+
+  /* Spacing scale */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Shadows & Glows */
+  --shadow-soft: 0 4px 24px rgba(53, 214, 255, 0.10), 0 1.5px 8px rgba(0,0,0,0.35);
+  --shadow-card: 0 2px 24px 0 #35d6ff22, 0 1.5px 8px rgba(0,0,0,0.35);
+  --shadow-glow: 0 0 8px 2px var(--color-accent-glow);
+  --shadow-glow-strong: 0 0 16px 4px #35d6ff55;
+  --shadow-glow-success: 0 0 8px 2px #5be6c555;
+  --shadow-glow-danger: 0 0 8px 2px #ff5e7e55;
+  --shadow-glow-warning: 0 0 8px 2px #ffe06655;
+  --shadow-glow-purple: 0 0 8px 2px #b97aff55;
+
+  /* Borders */
+  --stroke-soft: 1px solid rgba(255,255,255,0.06);
+  --stroke-strong: 1px solid #35d6ff55;
+  --stroke-card: 1.5px solid #35d6ff22;
+
+  /* Transitions */
+  --transition-fast: 0.12s cubic-bezier(.4,0,.2,1);
+  --transition: 0.22s cubic-bezier(.4,0,.2,1);
+  --transition-slow: 0.35s cubic-bezier(.4,0,.2,1);
+
+  /* Controls */
+  --button-height: 48px;
+  --button-radius: var(--radius-lg);
+  --input-radius: var(--radius-md);
+  --card-radius: var(--radius-lg);
+  --focus-ring: 0 0 0 3px rgba(53, 214, 255, 0.25);
+
+  /* Z-index */
+  --z-modal: 1000;
+  --z-popover: 900;
+  --z-header: 800;
+  --z-board: 100;
+  --z-base: 1;
+}
