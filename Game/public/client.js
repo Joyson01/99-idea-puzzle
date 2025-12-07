@@ -138,12 +138,58 @@ const multiplayerTip = document.getElementById("multiplayer-tip");
 const soloTip = document.getElementById("solo-tip");
 const quitSoloBtn = document.getElementById("quit-solo-btn");
 
+// ============================================================================
+// RESPONSIVE BOARD SIZING
+// ============================================================================
+
+/**
+ * Calculate and apply responsive cell size based on viewport and grid size
+ * Uses CSS-first approach with var(--cell-size) and JS fallback
+ */
+function updateBoardSize() {
+  if (!board || !gameState) return;
+
+  const gridSize = gameState.size;
+  const boardWrapper = board.parentElement; // .board-wrapper
+  const gapSize = 2; // 0.125rem converted to pixels (approximate)
+
+  // Calculate max available width (95% of viewport, capped at 720px)
+  const maxBoardWidth = Math.min(window.innerWidth * 0.95, 720);
+
+  // Calculate ideal cell size
+  // cellSize = (maxWidth - gaps) / gridSize
+  const totalGapWidth = gapSize * (gridSize - 1);
+  const availableForCells = maxBoardWidth - totalGapWidth;
+  const idealCellSize = Math.floor(availableForCells / gridSize);
+
+  // Enforce minimum cell size (36px on tiny screens, 44px preferred)
+  const minCellSize = window.innerWidth < 420 ? 36 : 44;
+  const cellSize = Math.max(minCellSize, idealCellSize);
+
+  // Set CSS variable for responsive sizing
+  board.style.setProperty("--cell-size", `${cellSize}px`);
+
+  // Calculate final board width for centering
+  const finalBoardWidth = cellSize * gridSize + totalGapWidth;
+  board.style.maxWidth = `${finalBoardWidth}px`;
+  board.style.width = "100%";
+}
+
+// Call on initial render and window resize
+window.addEventListener("resize", updateBoardSize);
+document.addEventListener("DOMContentLoaded", updateBoardSize);
+
 // Screen management
 function showScreen(screen) {
   document
     .querySelectorAll(".screen")
     .forEach((s) => s.classList.remove("active"));
   screen.classList.add("active");
+
+  // Re-calculate board size when showing game screen
+  if (screen === gameScreen) {
+    setTimeout(updateBoardSize, 100);
+  }
 }
 
 // ============================================================================
@@ -1169,8 +1215,10 @@ function renderBoard() {
   if (!gameState) return;
   const { size, blobs } = gameState;
   board.innerHTML = "";
-  board.style.gridTemplateColumns = `repeat(${size}, 45px)`;
-  board.style.gridTemplateRows = `repeat(${size}, 45px)`;
+
+  // Use responsive CSS Grid with var(--cell-size) instead of hardcoded pixels
+  board.style.gridTemplateColumns = `repeat(${size}, var(--cell-size, 3rem))`;
+  board.style.gridTemplateRows = `repeat(${size}, var(--cell-size, 3rem))`;
 
   // Add board size class for responsive scaling on mobile
   board.classList.remove(
@@ -1181,6 +1229,9 @@ function renderBoard() {
     "board-13x13"
   );
   board.classList.add(`board-${size}x${size}`);
+
+  // Store board size for JS-based fallback sizing
+  board.setAttribute("data-grid-size", size);
 
   // Create grid
   const grid = Array(size)
@@ -1219,6 +1270,9 @@ function renderBoard() {
       board.appendChild(cell);
     }
   }
+
+  // Update responsive sizing after board is rendered
+  setTimeout(updateBoardSize, 0);
 }
 
 // ============================================================================
