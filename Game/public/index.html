@@ -32,8 +32,8 @@
           </button>
         </header>
         <main class="menu-content" id="main-content">
-          <fieldset>
-            <legend class="visually-hidden">Player Settings</legend>
+          <fieldset class="player-settings">
+            <legend class="visually-hidden">Game Settings</legend>
 
             <div class="input-group">
               <label for="player-name">Your Name</label>
@@ -46,11 +46,8 @@
               />
             </div>
 
-            <fieldset
-              class="difficulty-section"
-              aria-labelledby="difficulty-legend"
-            >
-              <legend id="difficulty-legend">Select Difficulty</legend>
+            <fieldset class="difficulty-section">
+              <legend>Select Difficulty</legend>
               <div class="difficulty-grid">
                 <label class="difficulty-card" data-level="easy">
                   <input
@@ -157,36 +154,18 @@
             </fieldset>
 
             <div class="button-group cta-group">
-              <button
-                class="btn btn-success"
-                id="play-solo-btn"
-                aria-describedby="solo-description"
-              >
+              <button class="btn btn-success" id="play-solo-btn">
                 🎮 Play Solo
               </button>
-              <button
-                class="btn btn-primary"
-                id="create-room-btn"
-                aria-describedby="create-description"
-              >
+              <button class="btn btn-primary" id="create-room-btn">
                 Create Room
               </button>
-              <button
-                class="btn btn-secondary"
-                id="join-room-btn"
-                aria-describedby="join-description"
-              >
+              <button class="btn btn-secondary" id="join-room-btn">
                 Join Room
               </button>
             </div>
 
-            <div
-              id="join-room-container"
-              class="join-container hidden"
-              role="region"
-              aria-labelledby="join-title"
-            >
-              <h3 id="join-title" class="visually-hidden">Join Room</h3>
+            <div id="join-room-container" class="join-container hidden">
               <div class="input-group">
                 <label for="room-id-input">Room Code</label>
                 <input
@@ -480,11 +459,7 @@
           <ul id="leaderboard-list" class="leaderboard-list" role="list"></ul>
         </section>
         <footer class="modal-footer">
-          <button
-            id="leaderboard-close-btn"
-            class="btn btn-primary"
-            aria-label="Close this dialog"
-          >
+          <button id="leaderboard-close-btn" class="btn btn-primary">
             Close
           </button>
         </footer>
@@ -623,6 +598,7 @@
 
     <!-- Scripts -->
     <script src="/socket.io/socket.io.js"></script>
+    <script src="../game-logic.js"></script>
     <script src="client.js"></script>
   </body>
 </html>

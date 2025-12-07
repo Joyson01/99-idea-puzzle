@@ -30,8 +30,19 @@ const rooms = new Map();
 // ============================================================================
 // GAME ROOM CLASS (RACE MODE)
 // ============================================================================
+
+/**
+ * Represents a multiplayer game room with race mode support
+ * @class GameRoom
+ */
 class GameRoom {
-  constructor(roomId, difficulty) {
+  /**
+   * Creates a new game room
+   * @param {string} roomId - Unique 6-character room identifier
+   * @param {string} difficulty - Game difficulty level (easy, medium, hard, veryhard, insane)
+   * @param {string|null} hostId - Socket ID of the room host
+   */
+  constructor(roomId, difficulty, hostId = null) {
     this.roomId = roomId;
     this.difficulty = difficulty;
     this.players = [];
@@ -40,14 +51,28 @@ class GameRoom {
     this.started = false;
     this.currentTurn = 0;
     this.gameState = null; // Shared gameState for compatibility with client
+    this.host = hostId; // Initialize host ID to prevent undefined
+    this.timerInterval = null; // Timer for race mode
+    this.startedAt = null; // Timestamp when game started
   }
 
+  /**
+   * Adds a player to the game room
+   * @param {string} id - Socket ID of the player
+   * @param {string} name - Display name of the player
+   * @returns {boolean} True if player was added, false if room is full
+   */
   addPlayer(id, name) {
     if (this.players.length >= CONFIG.MAX_PLAYERS) return false;
     this.players.push({ id, name, rank: null, ready: false, score: 0 });
     return true;
   }
 
+  /**
+   * Removes a player from the game room and reassigns host if necessary
+   * @param {string} id - Socket ID of the player to remove
+   * @returns {boolean} True if room should be deleted (no players left), false otherwise
+   */
   removePlayer(id) {
     this.players = this.players.filter((p) => p.id !== id);
     delete this.playerBoards[id];
@@ -62,6 +87,10 @@ class GameRoom {
     return false;
   }
 
+  /**
+   * Starts the game by creating puzzles and initializing race timer
+   * Creates both shared gameState and per-player boards for race mode
+   */
   startGame() {
     this.started = true;
     this.finishOrder = [];
@@ -116,10 +145,20 @@ class GameRoom {
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+/**
+ * Generates a random 6-character alphanumeric room code
+ * @returns {string} Uppercase 6-character room code
+ */
 function generateRoomCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+/**
+ * Sanitizes player name by trimming whitespace and limiting length
+ * @param {string} name - Raw player name input
+ * @returns {string} Sanitized name (max 20 characters)
+ */
 function sanitizeName(name) {
   return name.trim().substring(0, 20);
 }
@@ -139,9 +178,8 @@ io.on("connection", (socket) => {
       ? difficulty
       : CONFIG.DEFAULT_DIFFICULTY;
 
-    let room = new GameRoom(roomId, diff);
-    // mark creator as host
-    room.host = socket.id;
+    // Create room with host ID to prevent undefined host
+    let room = new GameRoom(roomId, diff, socket.id);
     room.addPlayer(socket.id, playerName);
     rooms.set(roomId, room);
 
@@ -164,8 +202,14 @@ io.on("connection", (socket) => {
   // ---------------- JOIN ROOM ----------------
   socket.on("joinRoom", ({ roomId, playerName }) => {
     try {
+      // Validate inputs
+      if (!roomId || !playerName) {
+        socket.emit("error", { message: "Invalid room code or player name" });
+        return;
+      }
+
       playerName = sanitizeName(playerName);
-      roomId = roomId.toUpperCase();
+      roomId = roomId.trim().toUpperCase();
 
       const room = rooms.get(roomId);
 
@@ -212,71 +256,123 @@ io.on("connection", (socket) => {
   // ---------------- READY TO START ----------------
   // Backward-compatible: allow host to force-start
   socket.on("startGame", ({ roomId }) => {
-    const room = rooms.get(roomId);
-    if (!room) {
-      console.error(`[startGame] Room not found: ${roomId}`);
-      return;
-    }
-
-    // Only host can start the game
-    console.log(
-      `[startGame] Attempting to start from socket=${socket.id}, room.host=${room.host}`
-    );
-    if (room.host && socket.id !== room.host) {
-      console.error(
-        `[startGame] socket.id ${socket.id} is not the host ${room.host}`
-      );
-      socket.emit("error", { message: "Only the host can start the game" });
-      return;
-    }
-
-    console.log(
-      `[startGame] Host ${socket.id} starting game in room ${roomId}`
-    );
-    room.startGame();
-
-    // Emit in client-friendly format and indicate race mode
-    io.to(roomId).emit("gameStart", {
-      gameState: room.gameState,
-      currentPlayer: room.getCurrentPlayer(),
-      raceMode: true,
-    });
-
-    // Send initial per-player boards to each connected player
-    for (let p of room.players) {
-      const board = room.playerBoards[p.id];
-      if (board) {
-        // Broadcast each player's initial board to the room with playerId
-        io.to(roomId).emit("boardUpdate", { playerId: p.id, board });
+    try {
+      if (!roomId) {
+        socket.emit("error", { message: "Room ID is required" });
+        return;
       }
-    }
 
-    console.log(`Game Started in Room ${roomId}`);
+      const room = rooms.get(roomId);
+      if (!room) {
+        console.error(`[startGame] Room not found: ${roomId}`);
+        socket.emit("error", { message: "Room not found" });
+        return;
+      }
+
+      // Validate host
+      if (!room.host) {
+        console.error(`[startGame] Room ${roomId} has no host assigned`);
+        socket.emit("error", { message: "Room has no host" });
+        return;
+      }
+
+      // Only host can start the game
+      console.log(
+        `[startGame] Attempting to start from socket=${socket.id}, room.host=${room.host}`
+      );
+      if (socket.id !== room.host) {
+        console.error(
+          `[startGame] socket.id ${socket.id} is not the host ${room.host}`
+        );
+        socket.emit("error", { message: "Only the host can start the game" });
+        return;
+      }
+
+      // Validate players
+      if (room.players.length === 0) {
+        socket.emit("error", { message: "No players in room" });
+        return;
+      }
+
+      console.log(
+        `[startGame] Host ${socket.id} starting game in room ${roomId}`
+      );
+      room.startGame();
+
+      // Emit in client-friendly format and indicate race mode
+      io.to(roomId).emit("gameStart", {
+        gameState: room.gameState,
+        currentPlayer: room.getCurrentPlayer(),
+        raceMode: true,
+      });
+
+      // Send initial per-player boards to each connected player
+      for (let p of room.players) {
+        const board = room.playerBoards[p.id];
+        if (board) {
+          // Broadcast each player's initial board to the room with playerId
+          io.to(roomId).emit("boardUpdate", { playerId: p.id, board });
+        }
+      }
+
+      console.log(`Game Started in Room ${roomId}`);
+    } catch (error) {
+      console.error("[startGame] Error:", error);
+      socket.emit("error", { message: "Failed to start game" });
+    }
   });
 
   // Player toggles ready state; when all ready, server starts the game
   socket.on("playerReady", ({ roomId }) => {
-    const room = rooms.get(roomId);
-    if (!room) return;
+    try {
+      if (!roomId) {
+        socket.emit("error", { message: "Room ID is required" });
+        return;
+      }
 
-    room.setPlayerReady(socket.id, true);
-    io.to(roomId).emit("playersUpdate", {
-      players: room.players,
-      hostId: room.host,
-    });
+      const room = rooms.get(roomId);
+      if (!room) {
+        socket.emit("error", { message: "Room not found" });
+        return;
+      }
 
-    if (room.allPlayersReady()) {
-      // Notify room that all players are ready and that the host can start
-      io.to(roomId).emit("allPlayersReady", { hostId: room.host });
-      console.log(`All players ready in ${roomId} — waiting for host to start`);
+      room.setPlayerReady(socket.id, true);
+      io.to(roomId).emit("playersUpdate", {
+        players: room.players,
+        hostId: room.host,
+      });
+
+      if (room.allPlayersReady()) {
+        // Notify room that all players are ready and that the host can start
+        io.to(roomId).emit("allPlayersReady", { hostId: room.host });
+        console.log(
+          `All players ready in ${roomId} — waiting for host to start`
+        );
+      }
+    } catch (error) {
+      console.error("[playerReady] Error:", error);
+      socket.emit("error", { message: "Failed to set ready status" });
     }
   });
 
   // Client may request current players list
   socket.on("getPlayers", ({ roomId }) => {
-    const room = rooms.get(roomId);
-    if (!room) return;
-    socket.emit("playersUpdate", { players: room.players, hostId: room.host });
+    try {
+      if (!roomId) return;
+
+      const room = rooms.get(roomId);
+      if (!room) {
+        socket.emit("error", { message: "Room not found" });
+        return;
+      }
+
+      socket.emit("playersUpdate", {
+        players: room.players,
+        hostId: room.host,
+      });
+    } catch (error) {
+      console.error("[getPlayers] Error:", error);
+    }
   });
 
   // ---------------- MOVEMENT ----------------
@@ -360,39 +456,43 @@ io.on("connection", (socket) => {
 
   // ---------------- DISCONNECT ----------------
   socket.on("disconnect", () => {
-    console.log("Player Disconnected:", socket.id);
+    try {
+      console.log("Player Disconnected:", socket.id);
 
-    rooms.forEach((room, roomId) => {
-      if (room.players.some((p) => p.id === socket.id)) {
-        const wasHost = room.host === socket.id;
-        const deleteRoom = room.removePlayer(socket.id);
+      rooms.forEach((room, roomId) => {
+        if (room.players.some((p) => p.id === socket.id)) {
+          const wasHost = room.host === socket.id;
+          const deleteRoom = room.removePlayer(socket.id);
 
-        if (deleteRoom) {
-          if (room.timerInterval) room.stopTimer();
-          rooms.delete(roomId);
-          console.log(`Room Deleted: ${roomId}`);
-        } else {
-          // Notify remaining players about updated player list and potentially new host
-          io.to(roomId).emit("playersUpdate", {
-            players: room.players,
-            hostId: room.host,
-          });
-
-          if (wasHost && room.players.length > 0) {
-            // Notify room that host has changed
-            const newHostName =
-              room.players.find((p) => p.id === room.host)?.name || "Unknown";
-            io.to(roomId).emit("hostChanged", {
-              newHostId: room.host,
-              newHostName,
+          if (deleteRoom) {
+            if (room.timerInterval) room.stopTimer();
+            rooms.delete(roomId);
+            console.log(`Room Deleted: ${roomId}`);
+          } else {
+            // Notify remaining players about updated player list and potentially new host
+            io.to(roomId).emit("playersUpdate", {
+              players: room.players,
+              hostId: room.host,
             });
-            console.log(
-              `[disconnect] Host changed in room ${roomId} to ${room.host} (${newHostName})`
-            );
+
+            if (wasHost && room.players.length > 0) {
+              // Notify room that host has changed
+              const newHostName =
+                room.players.find((p) => p.id === room.host)?.name || "Unknown";
+              io.to(roomId).emit("hostChanged", {
+                newHostId: room.host,
+                newHostName,
+              });
+              console.log(
+                `[disconnect] Host changed in room ${roomId} to ${room.host} (${newHostName})`
+              );
+            }
           }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error("[disconnect] Error:", error);
+    }
   });
 });
 

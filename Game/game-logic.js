@@ -2,7 +2,8 @@
 // SHARED GAME LOGIC MODULE (Server & Client)
 // ============================================================================
 
-const COLORS = ["red", "yellow", "cyan"];
+// Use hex colors for consistency with client rendering
+const COLORS = ["#ff4757", "#ffa502", "#1e90ff"];
 
 const DIFFICULTY_SETTINGS = {
   easy: { size: 5, balls: 2, minDistance: 2 },

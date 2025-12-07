@@ -66,6 +66,8 @@ let isRaceMode = false;
 let isHost = false; // whether current player is room host
 let playerBoards = {}; // map playerId -> board
 let hostId = null; // track current host ID
+let isConnected = false; // track socket connection state
+let isConnecting = false; // track if connection is in progress
 
 // DOM elements
 const menuScreen = document.getElementById("menu-screen");
@@ -150,29 +152,121 @@ function updateBoardSize() {
   if (!board || !gameState) return;
 
   const gridSize = gameState.size;
-  const boardWrapper = board.parentElement; // .board-wrapper
-  const gapSize = 2; // 0.125rem converted to pixels (approximate)
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
 
-  // Calculate max available width (95% of viewport, capped at 720px)
-  const maxBoardWidth = Math.min(window.innerWidth * 0.95, 720);
-
-  // Calculate ideal cell size
-  // cellSize = (maxWidth - gaps) / gridSize
+  // Responsive gap size
+  const gapSize = viewportWidth < 480 ? 2 : viewportWidth < 768 ? 3 : 4;
   const totalGapWidth = gapSize * (gridSize - 1);
-  const availableForCells = maxBoardWidth - totalGapWidth;
-  const idealCellSize = Math.floor(availableForCells / gridSize);
 
-  // Enforce minimum cell size (36px on tiny screens, 44px preferred)
-  const minCellSize = window.innerWidth < 420 ? 36 : 44;
-  const cellSize = Math.max(minCellSize, idealCellSize);
+  // Calculate available width based on viewport with intelligent margins
+  let availableWidth;
+  let boardPadding;
+  let containerMargin;
+
+  if (viewportWidth < 480) {
+    // Extra small mobile - minimal padding
+    containerMargin = 80;
+    availableWidth = viewportWidth - containerMargin;
+    boardPadding = 10;
+  } else if (viewportWidth < 640) {
+    // Small mobile - compact
+    containerMargin = 100;
+    availableWidth = viewportWidth - containerMargin;
+    boardPadding = 14;
+  } else if (viewportWidth < 768) {
+    // Large mobile/small tablet - more breathing room
+    containerMargin = 140;
+    availableWidth = viewportWidth - containerMargin;
+    boardPadding = 18;
+  } else if (viewportWidth < 1024) {
+    // Tablet/small desktop - account for sidebar
+    containerMargin = 480;
+    availableWidth = viewportWidth - containerMargin;
+    boardPadding = 22;
+  } else if (viewportWidth < 1280) {
+    // Medium desktop - balanced layout
+    containerMargin = 580;
+    availableWidth = Math.min(viewportWidth - containerMargin, 600);
+    boardPadding = 26;
+  } else {
+    // Large desktop - maximum usable space
+    containerMargin = 660;
+    availableWidth = Math.min(viewportWidth - containerMargin, 700);
+    boardPadding = 30;
+  }
+
+  // Calculate available space for cells
+  const availableForCells = Math.max(
+    150,
+    availableWidth - boardPadding * 2 - totalGapWidth
+  );
+  let cellSize = Math.floor(availableForCells / gridSize);
+
+  // Dynamic max cell sizes based on grid size with screen-aware scaling
+  let maxCellSize;
+  let minCellSize = 20;
+
+  // Base max sizes for different grid sizes (conservative for zoom)
+  if (gridSize <= 5) {
+    maxCellSize = 70; // Easy (5x5) - very large
+    minCellSize = 28;
+  } else if (gridSize <= 7) {
+    maxCellSize = 58; // Medium (7x7) - large
+    minCellSize = 24;
+  } else if (gridSize <= 9) {
+    maxCellSize = 46; // Hard (9x9) - medium-large
+    minCellSize = 20;
+  } else if (gridSize <= 11) {
+    maxCellSize = 38; // Very Hard (11x11) - medium
+    minCellSize = 18;
+  } else {
+    maxCellSize = 32; // Insane (13x13) - compact but usable
+    minCellSize = 16;
+  }
+
+  // Scale max cell size based on viewport
+  const scaleFactor =
+    viewportWidth < 480
+      ? 0.65
+      : viewportWidth < 640
+      ? 0.75
+      : viewportWidth < 768
+      ? 0.85
+      : viewportWidth < 1024
+      ? 0.9
+      : 1.0;
+
+  maxCellSize = Math.floor(maxCellSize * scaleFactor);
+
+  // Apply constraints
+  cellSize = Math.max(minCellSize, Math.min(maxCellSize, cellSize));
 
   // Set CSS variable for responsive sizing
   board.style.setProperty("--cell-size", `${cellSize}px`);
+  board.style.setProperty("--gap-size", `${gapSize}px`);
 
-  // Calculate final board width for centering
-  const finalBoardWidth = cellSize * gridSize + totalGapWidth;
-  board.style.maxWidth = `${finalBoardWidth}px`;
-  board.style.width = "100%";
+  // Calculate and constrain final board width
+  const finalBoardWidth =
+    cellSize * gridSize + totalGapWidth + boardPadding * 2;
+
+  // Final safety check - NEVER exceed available space (extra margin for zoom)
+  const absoluteMax = availableWidth - 64; // Large safety margin for borders and zoom
+  const constrainedWidth = Math.min(finalBoardWidth, absoluteMax);
+
+  // If calculated width exceeds limit, recalculate cell size
+  if (finalBoardWidth > absoluteMax) {
+    const maxCellSizeForWidth = Math.floor(
+      (absoluteMax - boardPadding * 2 - totalGapWidth) / gridSize
+    );
+    const adjustedCellSize = Math.max(minCellSize, maxCellSizeForWidth);
+    board.style.setProperty("--cell-size", `${adjustedCellSize}px`);
+  }
+
+  // Apply width constraints
+  board.style.maxWidth = `${constrainedWidth}px`;
+  board.style.width = "fit-content";
+  board.style.margin = "0 auto";
 }
 
 // Call on initial render and window resize
@@ -237,8 +331,21 @@ difficultyRadios.forEach((radio) => {
 updateDifficultySelection(selectedDifficulty);
 
 // ============================================================================
-// HELPER FUNCTIONS - INPUT VALIDATION
+// HELPER FUNCTIONS - CONNECTION & INPUT VALIDATION
 // ============================================================================
+
+/**
+ * Checks if socket is connected before emitting events
+ * @returns {boolean} True if connected, false otherwise
+ */
+function ensureConnected() {
+  if (!isConnected || !socket.connected) {
+    showNotification("Not connected to server. Please wait...", "error");
+    return false;
+  }
+  return true;
+}
+
 /**
  * Validates player name input from the menu screen
  * @returns {string|null} Sanitized player name or null if invalid
@@ -283,8 +390,11 @@ function startSinglePlayerGame() {
   singlePlayerMoves = 0;
   isRaceMode = false; // Ensure race mode is off for solo
 
-  // Create local game state using game logic
-  gameState = createLocalPuzzle(selectedDifficulty);
+  // Create local game state using shared game logic
+  gameState =
+    typeof GameLogic !== "undefined"
+      ? GameLogic.createPuzzle(7, 3, selectedDifficulty)
+      : createLocalPuzzle(selectedDifficulty);
 
   // Update UI for single player
   if (soloStats) soloStats.style.display = "flex";
@@ -329,7 +439,8 @@ function updateSoloStats() {
 }
 
 function createLocalPuzzle(difficulty) {
-  const COLORS = ["#00ffff", "#ff007f", "#ffff00"];
+  // Use consistent color scheme with server
+  const COLORS = ["#ff4757", "#ffa502", "#1e90ff"];
   const DIFFICULTY_SETTINGS = {
     easy: { size: 5, balls: 2, minDistance: 2 },
     medium: { size: 7, balls: 3, minDistance: 3 },
@@ -479,7 +590,10 @@ function tryLocalSet() {
   showNotification("🎉 Puzzle Solved! Starting new round...", "success");
 
   setTimeout(() => {
-    gameState = createLocalPuzzle(selectedDifficulty);
+    gameState =
+      typeof GameLogic !== "undefined"
+        ? GameLogic.createPuzzle(7, 3, selectedDifficulty)
+        : createLocalPuzzle(selectedDifficulty);
     singlePlayerMoves = 0;
     updateSoloStats();
     renderBoard();
@@ -529,6 +643,8 @@ createRoomBtn.addEventListener("click", () => {
   const playerName = validatePlayerName();
   if (!playerName) return;
 
+  if (!ensureConnected()) return;
+
   isSinglePlayer = false;
   socket.emit("createRoom", { playerName, difficulty: selectedDifficulty });
 });
@@ -552,6 +668,8 @@ joinRoomSubmit.addEventListener("click", () => {
 
   const roomId = validateRoomCode(roomIdInput.value);
   if (!roomId) return;
+
+  if (!ensureConnected()) return;
 
   socket.emit("joinRoom", { roomId, playerName });
 });
@@ -612,7 +730,10 @@ setBtn.addEventListener("click", () => {
 
 newRoundBtn.addEventListener("click", () => {
   if (isSinglePlayer) {
-    gameState = createLocalPuzzle(selectedDifficulty);
+    gameState =
+      typeof GameLogic !== "undefined"
+        ? GameLogic.createPuzzle(7, 3, selectedDifficulty)
+        : createLocalPuzzle(selectedDifficulty);
     singlePlayerMoves = 0;
     updateSoloStats();
     renderBoard();
@@ -742,20 +863,26 @@ socket.on("connect", () => {
   try {
     currentPlayerId = socket.id;
     isHost = false; // Reset host status on new connection
-    console.log("✅ Connected to server");
+    isConnected = true;
+    isConnecting = false;
+    console.log("✅ Connected to server, ID:", currentPlayerId);
   } catch (error) {
     console.error("Error in connect handler:", error);
+    isConnected = false;
   }
 });
 
 socket.on("disconnect", (reason) => {
   try {
+    isConnected = false;
     console.log("❌ Disconnected:", reason);
     if (reason === "io server disconnect") {
+      isConnecting = true;
       socket.connect();
     }
   } catch (error) {
     console.error("Error in disconnect handler:", error);
+    isConnected = false;
   }
 });
 
@@ -950,8 +1077,15 @@ socket.on("leaderboardUpdate", (payload) => {
     });
 
     // Auto-open modal when first rank appears
-    if (anyRank && leaderboardModal.classList.contains("hidden")) {
-      leaderboardModal.classList.remove("hidden");
+    if (
+      anyRank &&
+      (leaderboardModal.classList.contains("hidden") || !leaderboardModal.open)
+    ) {
+      if (leaderboardModal.showModal) {
+        leaderboardModal.showModal();
+      } else {
+        leaderboardModal.classList.remove("hidden");
+      }
     }
 
     showNotification("Leaderboard updated", "info");
@@ -961,62 +1095,106 @@ socket.on("leaderboardUpdate", (payload) => {
 });
 
 leaderboardClose.addEventListener("click", () => {
-  leaderboardModal.classList.add("hidden");
+  if (leaderboardModal.close) {
+    leaderboardModal.close();
+  } else {
+    leaderboardModal.classList.add("hidden");
+  }
 });
 
 leaderboardCloseBtn.addEventListener("click", () => {
-  leaderboardModal.classList.add("hidden");
+  if (leaderboardModal.close) {
+    leaderboardModal.close();
+  } else {
+    leaderboardModal.classList.add("hidden");
+  }
 });
 
 // How to Play Modal Handlers
 howToPlayBtn.addEventListener("click", () => {
-  howToPlayModal.classList.remove("hidden");
+  if (howToPlayModal.showModal) {
+    howToPlayModal.showModal();
+  } else {
+    howToPlayModal.classList.remove("hidden");
+  }
 });
 
 howToPlayClose.addEventListener("click", () => {
-  howToPlayModal.classList.add("hidden");
+  if (howToPlayModal.close) {
+    howToPlayModal.close();
+  } else {
+    howToPlayModal.classList.add("hidden");
+  }
 });
 
 howToPlayCloseBtn.addEventListener("click", () => {
-  howToPlayModal.classList.add("hidden");
+  if (howToPlayModal.close) {
+    howToPlayModal.close();
+  } else {
+    howToPlayModal.classList.add("hidden");
+  }
 });
 
 // Close modal when clicking outside (on the modal backdrop)
 howToPlayModal.addEventListener("click", (e) => {
   if (e.target === howToPlayModal) {
-    howToPlayModal.classList.add("hidden");
+    if (howToPlayModal.close) {
+      howToPlayModal.close();
+    } else {
+      howToPlayModal.classList.add("hidden");
+    }
   }
 });
 
 leaderboardModal.addEventListener("click", (e) => {
   if (e.target === leaderboardModal) {
-    leaderboardModal.classList.add("hidden");
+    if (leaderboardModal.close) {
+      leaderboardModal.close();
+    } else {
+      leaderboardModal.classList.add("hidden");
+    }
   }
 });
 
 // Game screen How to Play button
 if (gameHowToPlayBtn) {
   gameHowToPlayBtn.addEventListener("click", () => {
-    howToPlayModal.classList.remove("hidden");
+    if (howToPlayModal.showModal) {
+      howToPlayModal.showModal();
+    } else {
+      howToPlayModal.classList.remove("hidden");
+    }
   });
 }
 
 // Game Instructions Modal Handlers (in-game)
 if (gameInstructionsBtn) {
   gameInstructionsBtn.addEventListener("click", () => {
-    gameInstructionsModal.classList.remove("hidden");
+    if (gameInstructionsModal.showModal) {
+      gameInstructionsModal.showModal();
+    } else {
+      gameInstructionsModal.classList.remove("hidden");
+    }
   });
 }
 
 if (gameInstructionsClose) {
   gameInstructionsClose.addEventListener("click", () => {
-    gameInstructionsModal.classList.add("hidden");
+    if (gameInstructionsModal.close) {
+      gameInstructionsModal.close();
+    } else {
+      gameInstructionsModal.classList.add("hidden");
+    }
   });
 }
 
 if (gameInstructionsCloseBtn) {
   gameInstructionsCloseBtn.addEventListener("click", () => {
-    gameInstructionsModal.classList.add("hidden");
+    if (gameInstructionsModal.close) {
+      gameInstructionsModal.close();
+    } else {
+      gameInstructionsModal.classList.add("hidden");
+    }
   });
 }
 
@@ -1024,7 +1202,11 @@ if (gameInstructionsCloseBtn) {
 if (gameInstructionsModal) {
   gameInstructionsModal.addEventListener("click", (e) => {
     if (e.target === gameInstructionsModal) {
-      gameInstructionsModal.classList.add("hidden");
+      if (gameInstructionsModal.close) {
+        gameInstructionsModal.close();
+      } else {
+        gameInstructionsModal.classList.add("hidden");
+      }
     }
   });
 }
