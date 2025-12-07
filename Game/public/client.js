@@ -1172,6 +1172,16 @@ function renderBoard() {
   board.style.gridTemplateColumns = `repeat(${size}, 45px)`;
   board.style.gridTemplateRows = `repeat(${size}, 45px)`;
 
+  // Add board size class for responsive scaling on mobile
+  board.classList.remove(
+    "board-5x5",
+    "board-7x7",
+    "board-9x9",
+    "board-11x11",
+    "board-13x13"
+  );
+  board.classList.add(`board-${size}x${size}`);
+
   // Create grid
   const grid = Array(size)
     .fill()
