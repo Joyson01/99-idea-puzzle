@@ -156,7 +156,7 @@ function updateBoardSize() {
   const viewportHeight = window.innerHeight;
 
   // Responsive gap size
-  const gapSize = viewportWidth < 480 ? 2 : viewportWidth < 768 ? 3 : 4;
+  const gapSize = viewportWidth < 480 ? 4 : viewportWidth < 768 ? 6 : 8;
   const totalGapWidth = gapSize * (gridSize - 1);
 
   // Calculate available width based on viewport with intelligent margins
@@ -245,10 +245,11 @@ function updateBoardSize() {
   // Set CSS variable for responsive sizing
   board.style.setProperty("--cell-size", `${cellSize}px`);
   board.style.setProperty("--gap-size", `${gapSize}px`);
+  board.style.setProperty("--board-padding", `${boardPadding}px`);
 
-  // Calculate and constrain final board width
+  // Calculate and constrain final board width (including 4px for borders)
   const finalBoardWidth =
-    cellSize * gridSize + totalGapWidth + boardPadding * 2;
+    cellSize * gridSize + totalGapWidth + boardPadding * 2 + 4;
 
   // Final safety check - NEVER exceed available space (extra margin for zoom)
   const absoluteMax = availableWidth - 64; // Large safety margin for borders and zoom
